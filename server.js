@@ -279,9 +279,109 @@ app.delete('/api/pets/:id', async (req, res) => {
     }
 });
 
+// VISITS ROUTES
+
+// GET /api/visits - Get all visits
+app.get('/api/visits', async (req, res) => {
+    try {
+        const visits = await Visits.findAll();
+        res.json(visits);
+    } catch (error) {
+        console.error('Error fetching visits:', error);
+        res.status(500).json({ error: 'Failed to fetch visits' });
+    }
+});
+
+// GET /api/visits/:id - Get single visit
+app.get('/api/visits/:id', async (req, res) => {
+    try {
+        const visit = await Visits.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Pets,
+                    attributes: ['id', 'ownerName', 'name']
+                },
+                {
+                    model: Treatments,
+                    attributes: ['id', 'issue', 'instruction']
+                }
+            ]
+        });
+        
+        if (!visit) {
+            return res.status(404).json({ error: 'Visit not found' });
+        }
+        
+        res.json(visit);
+    } catch (error) {
+        console.error('Error fetching visit:', error);
+        res.status(500).json({ error: 'Failed to fetch visit' });
+    }
+});
+
+// POST /api/visits - Create new visit
+app.post('/api/visits', async (req, res) => {
+    try {
+        const { visitDate, initialReason, symptoms, diagnosis, priority } = req.body;
+        
+        const newVisit = await Visits.create({
+            visitDate,
+            initialReason,
+            symptoms,
+            diagnosis,
+            priority
+        });
+        
+        res.status(201).json(newVisit);
+    } catch (error) {
+        console.error('Error creating visit:', error);
+        res.status(500).json({ error: 'Failed to create visit' });
+    }
+});
+
+// PUT /api/visits/:id - Update visit
+app.put('/api/visits/:id', async (req, res) => {
+    try {
+        const { visitDate, initialReason, symptoms, diagnosis, priority } = req.body;
+        
+        const [updatedRowsCount] = await Visits.update(
+            { visitDate, initialReason, symptoms, diagnosis, priority },
+            { where: { id: req.params.id } }
+        );
+        
+        if (updatedRowsCount === 0) {
+            return res.status(404).json({ error: 'Visit not found' });
+        }
+        
+        const updatedVisit = await Visits.findByPk(req.params.id);
+        res.json(updatedVisit);
+    } catch (error) {
+        console.error('Error updating visit:', error);
+        res.status(500).json({ error: 'Failed to update visit' });
+    }
+});
+
+// DELETE /api/visits/:id - Delete visit
+app.delete('/api/visits/:id', async (req, res) => {
+    try {
+        const deletedRowsCount = await Visits.destroy({
+            where: { id: req.params.id }
+        });
+        
+        if (deletedRowsCount === 0) {
+            return res.status(404).json({ error: 'Visit not found' });
+        }
+        
+        res.json({ message: 'Visit deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting visit:', error);
+        res.status(500).json({ error: 'Failed to delete visit' });
+    }
+});
+
 // Start server
 if (require.main === module) {
-    app.listen(port, () => {
-         console.log(`API server running at http://localhost:${port}`);
+    app.listen(PORT, () => {
+         console.log(`API server running at http://localhost:${PORT}`);
     });
 };
