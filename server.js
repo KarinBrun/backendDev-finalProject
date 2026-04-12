@@ -303,7 +303,7 @@ app.get('/api/visits/:id', async (req, res) => {
                 },
                 {
                     model: Treatments,
-                    attributes: ['id', 'issue', 'instruction']
+                    attributes: ['id', 'issue', 'instructions']
                 }
             ]
         });
@@ -322,14 +322,15 @@ app.get('/api/visits/:id', async (req, res) => {
 // POST /api/visits - Create new visit
 app.post('/api/visits', async (req, res) => {
     try {
-        const { visitDate, initialReason, symptoms, diagnosis, priority } = req.body;
+        const { visitDate, initialReason, symptoms, diagnosis, priority, petsId } = req.body;
         
         const newVisit = await Visits.create({
             visitDate,
             initialReason,
             symptoms,
             diagnosis,
-            priority
+            priority,
+            petsId
         });
         
         res.status(201).json(newVisit);
@@ -342,10 +343,10 @@ app.post('/api/visits', async (req, res) => {
 // PUT /api/visits/:id - Update visit
 app.put('/api/visits/:id', async (req, res) => {
     try {
-        const { visitDate, initialReason, symptoms, diagnosis, priority } = req.body;
+        const { visitDate, initialReason, symptoms, diagnosis, priority, petsId } = req.body;
         
         const [updatedRowsCount] = await Visits.update(
-            { visitDate, initialReason, symptoms, diagnosis, priority },
+            { visitDate, initialReason, symptoms, diagnosis, priority, petsId },
             { where: { id: req.params.id } }
         );
         
@@ -376,6 +377,101 @@ app.delete('/api/visits/:id', async (req, res) => {
     } catch (error) {
         console.error('Error deleting visit:', error);
         res.status(500).json({ error: 'Failed to delete visit' });
+    }
+});
+
+// TREATMENTS ROUTES
+
+// GET /api/treatments - Get all treatments
+app.get('/api/treatments', async (req, res) => {
+    try {
+        const treatments = await Treatments.findAll();
+        res.json(treatments);
+    } catch (error) {
+        console.error('Error fetching treatments:', error);
+        res.status(500).json({ error: 'Failed to fetch treatments' });
+    }
+});
+
+// GET /api/treatments/:id - Get single treatment
+app.get('/api/treatments/:id', async (req, res) => {
+    try {
+        const treatment = await Treatments.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Visits,
+                    attributes: ['id', 'visitDate', 'initialReason']
+                }
+            ]
+        });
+        
+        if (!treatment) {
+            return res.status(404).json({ error: 'Treatment not found' });
+        }
+        
+        res.json(treatment);
+    } catch (error) {
+        console.error('Error fetching treatment:', error);
+        res.status(500).json({ error: 'Failed to fetch treatment' });
+    }
+});
+
+// POST /api/treatments - Create new treatment
+app.post('/api/treatments', async (req, res) => {
+    try {
+        const { issue, description, instructions, visitsId } = req.body;
+        
+        const newTreatment = await Treatments.create({
+            issue,
+            description,
+            instructions,
+            visitsId
+        });
+        
+        res.status(201).json(newTreatment);
+    } catch (error) {
+        console.error('Error creating treatment:', error);
+        res.status(500).json({ error: 'Failed to create treatment' });
+    }
+});
+
+// PUT /api/treatments/:id - Update treatment
+app.put('/api/treatments/:id', async (req, res) => {
+    try {
+        const { issue, description, instructions, visitsId } = req.body;
+        
+        const [updatedRowsCount] = await Treatments.update(
+            { issue, description, instructions, visitsId },
+            { where: { id: req.params.id } }
+        );
+        
+        if (updatedRowsCount === 0) {
+            return res.status(404).json({ error: 'Treatment not found' });
+        }
+        
+        const updatedTreatment = await Treatments.findByPk(req.params.id);
+        res.json(updatedTreatment);
+    } catch (error) {
+        console.error('Error updating treatment:', error);
+        res.status(500).json({ error: 'Failed to update treatment' });
+    }
+});
+
+// DELETE /api/treatments/:id - Delete treatment
+app.delete('/api/treatments/:id', async (req, res) => {
+    try {
+        const deletedRowsCount = await Treatments.destroy({
+            where: { id: req.params.id }
+        });
+        
+        if (deletedRowsCount === 0) {
+            return res.status(404).json({ error: 'Treatment not found' });
+        }
+        
+        res.json({ message: 'Treatment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting treatment:', error);
+        res.status(500).json({ error: 'Failed to delete treatment' });
     }
 });
 
