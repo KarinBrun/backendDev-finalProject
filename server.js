@@ -90,6 +90,8 @@ async function testConnection() {
 
 testConnection();
 
+module.exports = app;
+
 // AUTHENTICATION ROUTES
 
 // POST /api/register - Register new user
@@ -278,6 +280,8 @@ app.delete('/api/pets/:id', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(port, () => {
+         console.log(`API server running at http://localhost:${port}`);
+    });
+};

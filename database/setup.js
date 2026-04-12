@@ -2,9 +2,18 @@ const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 
 // Initialize database connection
+let storagePath;
+if (process.env.NODE_ENV === 'test') {
+    storagePath = ':memory:';
+} else if (process.env.DB_NAME) {
+    storagePath = `database/${process.env.DB_NAME}`;
+} else {
+    storagePath = 'database/vetclinic.db';
+}
+
 const db = new Sequelize({
     dialect: process.env.DB_TYPE,
-    storage: `database/${process.env.DB_NAME}` || 'database/vetclinic.db',
+    storage: storagePath,
     logging: false
 });
 
