@@ -1,7 +1,12 @@
-const { request, app, cleanDB } = require('./helpers');
+const { request, app, cleanDB, createUser, loginUser } = require('./helpers');
+
+let jwtToken;
+
 
 beforeAll(async () => {
     await cleanDB();
+    await createUser();
+    jwtToken = await loginUser();
 });
 
 describe('Pets API', () => {
@@ -18,6 +23,7 @@ describe('Pets API', () => {
 
         let response = await request(app)
             .post('/api/pets')
+            .set('Authorization', `Bearer ${jwtToken}`)
             .send(newPet);
     
         expect(response.status).toBe(201);
@@ -26,14 +32,18 @@ describe('Pets API', () => {
     });
 
     test('should return all pets', async () => {
-        let response = await request(app).get('/api/pets');
+        let response = await request(app)
+            .get('/api/pets')
+            .set('Authorization', `Bearer ${jwtToken}`);
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveLength(1); 
     });
 
     test('should return pet by ID', async () => {
-        let response = await request(app).get('/api/pets/1');
+        let response = await request(app)
+            .get('/api/pets/1')
+            .set('Authorization', `Bearer ${jwtToken}`);
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id', 1);
@@ -47,7 +57,9 @@ describe('Pets API', () => {
     });
 
     test('should return an error when ID not found', async () => {
-        const response = await request(app).get('/api/pets/999');
+        const response = await request(app)
+            .get('/api/pets/999')
+            .set('Authorization', `Bearer ${jwtToken}`);
     
         expect(response.status).toBe(404);
         expect(response.body).toHaveProperty('error');
@@ -66,6 +78,7 @@ describe('Pets API', () => {
 
         let response = await request(app)
             .put('/api/pets/1')
+            .set('Authorization', `Bearer ${jwtToken}`)
             .send(updatedPet);
     
         expect(response.status).toBe(200);
@@ -73,7 +86,9 @@ describe('Pets API', () => {
     });
 
     test('should delete existing pet', async () => {
-        let response = await request(app).delete('/api/pets/1');
+        let response = await request(app)
+            .delete('/api/pets/1')
+            .set('Authorization', `Bearer ${jwtToken}`);
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('message');

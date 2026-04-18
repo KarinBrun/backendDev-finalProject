@@ -1,10 +1,13 @@
-const { request, app, cleanDB, createPet } = require('./helpers');
+const { request, app, cleanDB, createUser, loginUser, createPet } = require('./helpers');
 
 let petId;
+let jwtToken;
 
 beforeAll(async () => {
     await cleanDB();
-    petId = await createPet();
+    await createUser();
+    jwtToken = await loginUser();
+    petId = await createPet(jwtToken);
 });
 
 describe('Visits API', () => {
@@ -20,6 +23,7 @@ describe('Visits API', () => {
 
         let response = await request(app)
             .post('/api/visits')
+            .set('Authorization', `Bearer ${jwtToken}`)
             .send(newVisit);
     
         expect(response.status).toBe(201);
@@ -28,14 +32,18 @@ describe('Visits API', () => {
     });
 
     test('should return all visits', async () => {
-        let response = await request(app).get('/api/visits');
+        let response = await request(app)
+            .get('/api/visits')
+            .set('Authorization', `Bearer ${jwtToken}`);
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveLength(1); 
     });
 
     test('should return visit by ID', async () => {
-        let response = await request(app).get('/api/visits/1');
+        let response = await request(app)
+            .get('/api/visits/1')
+            .set('Authorization', `Bearer ${jwtToken}`);
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id', 1);
@@ -49,7 +57,9 @@ describe('Visits API', () => {
     });
 
     test('should return an error when ID not found', async () => {
-        const response = await request(app).get('/api/visits/999');
+        const response = await request(app)
+            .get('/api/visits/999')
+            .set('Authorization', `Bearer ${jwtToken}`);
     
         expect(response.status).toBe(404);
         expect(response.body).toHaveProperty('error');
@@ -67,6 +77,7 @@ describe('Visits API', () => {
 
         let response = await request(app)
             .put('/api/visits/1')
+            .set('Authorization', `Bearer ${jwtToken}`)
             .send(updatedVisit);
     
         expect(response.status).toBe(200);
@@ -74,7 +85,9 @@ describe('Visits API', () => {
     });
 
     test('should delete existing visit', async () => {
-        let response = await request(app).delete('/api/visits/1');
+        let response = await request(app)
+            .delete('/api/visits/1')
+            .set('Authorization', `Bearer ${jwtToken}`);
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('message');

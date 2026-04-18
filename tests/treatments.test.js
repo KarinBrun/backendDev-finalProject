@@ -1,12 +1,15 @@
-const { request, app, cleanDB, createPet, createVisit } = require('./helpers');
+const { request, app, cleanDB, createUser, loginUser, createPet, createVisit } = require('./helpers');
 
+let jwtToken;
 let petId;
 let visitId;
 
 beforeAll(async () => {
     await cleanDB();
-    petId = await createPet();
-    visitId = await createVisit(petId);
+    await createUser();
+    jwtToken = await loginUser();
+    petId = await createPet(jwtToken);
+    visitId = await createVisit(petId, jwtToken);
 });
 
 describe('Treatments API', () => {
@@ -20,6 +23,7 @@ describe('Treatments API', () => {
 
         let response = await request(app)
             .post('/api/treatments')
+            .set('Authorization', `Bearer ${jwtToken}`)
             .send(newTreatment);
     
         expect(response.status).toBe(201);
@@ -28,14 +32,18 @@ describe('Treatments API', () => {
     });
 
     test('should return all treatments', async () => {
-        let response = await request(app).get('/api/treatments');
+        let response = await request(app)
+            .get('/api/treatments')
+            .set('Authorization', `Bearer ${jwtToken}`);
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveLength(1); 
     });
 
     test('should return treatment by ID', async () => {
-        let response = await request(app).get('/api/treatments/1');
+        let response = await request(app)
+            .get('/api/treatments/1')
+            .set('Authorization', `Bearer ${jwtToken}`);
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id', 1);
@@ -46,7 +54,9 @@ describe('Treatments API', () => {
     });
 
     test('should return an error when ID not found', async () => {
-        const response = await request(app).get('/api/treatments/999');
+        const response = await request(app)
+            .get('/api/treatments/999')
+            .set('Authorization', `Bearer ${jwtToken}`);
     
         expect(response.status).toBe(404);
         expect(response.body).toHaveProperty('error');
@@ -62,6 +72,7 @@ describe('Treatments API', () => {
 
         let response = await request(app)
             .put('/api/treatments/1')
+            .set('Authorization', `Bearer ${jwtToken}`)
             .send(updatedTreatment);
     
         expect(response.status).toBe(200);
@@ -69,7 +80,9 @@ describe('Treatments API', () => {
     });
 
     test('should delete existing treatment', async () => {
-        let response = await request(app).delete('/api/treatments/1');
+        let response = await request(app)
+            .delete('/api/treatments/1')
+            .set('Authorization', `Bearer ${jwtToken}`);
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('message');
