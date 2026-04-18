@@ -32,6 +32,36 @@ A RESTful API for managing a vet clinic's records built with Node.js, Express.js
 
 ## API Endpoints
 
+### USER ROUTE
+### Create New User
+- **POST** `/api/register`
+- Creates a new user
+- **Body:**
+  ```json
+    {
+        "name": "Mary Sherif",
+        "email": "mary@vet.com",
+        "password": "passwordHere",
+        "role": "admin"
+    }
+  ```
+
+### Login User
+- **POST** `/api/login`
+- Logs in a user
+- **Body:**
+  ```json
+    {
+        "email": "mary@vet.com",
+        "password": "passwordHere"
+    }
+  ```
+
+### Logout
+- **POST** `/api/logout`
+- Logs out a user
+
+
 ### PETS ROUTE
 ### Get All Pets
 - **GET** `/api/pets`
@@ -130,6 +160,14 @@ A RESTful API for managing a vet clinic's records built with Node.js, Express.js
 
 ## Database Schema
 
+The `user` table contains the following fields:
+
+- `id` (INTEGER, Primary Key, Auto Increment)
+- `name` (STRING, Required)
+- `email` (STRING, Required)
+- `password` (STRING, Required)
+- `role` (STRING, Required)
+
 The `pets` table contains the following fields:
 
 - `id` (INTEGER, Primary Key, Auto Increment)
@@ -160,6 +198,9 @@ The `treatments` table contains the following fields:
 ## Postman Documentation URL
 https://documenter.getpostman.com/view/52413032/2sBXitDTFt
 
+## Render URL
+https://backenddev-finalproject.onrender.com
+
 ## Project Structure
 
 ```
@@ -171,6 +212,7 @@ final-project/
 │   ├── helpers.test.js       # Setup for tests
 │   ├── pets.test.js          # Tests for Pets API
 │   ├── treatments.test.js    # Tests for Treatments API
+│   ├── user.test.js          # Tests for User API
 │   └── visits.test.js        # Tests for Visits API
 ├── server.js                 # Main server file with API routes
 ├── package.json
