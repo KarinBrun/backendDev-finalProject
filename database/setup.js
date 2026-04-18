@@ -18,34 +18,34 @@ const db = new Sequelize({
 });
 
 // User Model
-// const User = db.define('User', {
-//     id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true
-//     },
-//     name: {
-//         type: DataTypes.STRING,
-//         allowNull: false
-//     },
-//     email: {
-//         type: DataTypes.STRING,
-//         allowNull: false,
-//         unique: true
-//     },
-//     password: {
-//         type: DataTypes.STRING,
-//         allowNull: false
-//     },
-//     role: {
-//         type: DataTypes.STRING,
-//         allowNull: false,
-//         defaultValue: "employee",
-//         validate: {
-//             isIn: [['employee', 'manager', 'admin']]
-//         }
-//     }
-// });
+const User = db.define('User', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "vettech",
+        validate: {
+            isIn: [['vettech', 'vet', 'admin']]
+        }
+    }
+});
 
 // Pets Model
 const Pets = db.define('Pets', {
@@ -141,9 +141,6 @@ Visits.belongsTo(Pets, { foreignKey: 'petsId' });
 Visits.hasMany(Treatments, { foreignKey: 'visitsId' });
 Treatments.belongsTo(Visits, { foreignKey: 'visitsId' });
 
-// User.hasMany(Task, { foreignKey: 'assignedUserId', as: 'assignedTasks' });
-// Task.belongsTo(User, { foreignKey: 'assignedUserId', as: 'assignedUser' });
-
 // Initialize database
 async function initializeDatabase() {
     try {
@@ -161,6 +158,7 @@ initializeDatabase();
 
 module.exports = {
     db,
+    User,
     Pets,
     Visits,
     Treatments

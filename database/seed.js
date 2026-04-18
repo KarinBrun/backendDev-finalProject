@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { db, Pets, Visits, Treatments } = require('./setup');
+const { db, User, Pets, Visits, Treatments } = require('./setup');
 
 async function seedDatabase() {
     try {
@@ -8,28 +8,28 @@ async function seedDatabase() {
         console.log('Database reset successfully.');
 
         // Create sample users
-        // const hashedPassword = await bcrypt.hash('password123', 10);
+        const hashedPassword = await bcrypt.hash('password123', 10);
         
-        // const users = await User.bulkCreate([
-        //     {
-        //         name: 'John Employee',
-        //         email: 'john@company.com',
-        //         password: hashedPassword,
-        //         role: 'employee'
-        //     },
-        //     {
-        //         name: 'Sarah Manager',
-        //         email: 'sarah@company.com',
-        //         password: hashedPassword,
-        //         role: 'manager'
-        //     },
-        //     {
-        //         name: 'Mike Admin',
-        //         email: 'mike@company.com',
-        //         password: hashedPassword,
-        //         role: 'admin'
-        //     }
-        // ]);
+        const users = await User.bulkCreate([
+            {
+                name: 'John Smith',
+                email: 'john@vet.com',
+                password: hashedPassword,
+                role: 'vettech'
+            },
+            {
+                name: 'Sarah Dole',
+                email: 'sarah@vet.com',
+                password: hashedPassword,
+                role: 'vet'
+            },
+            {
+                name: 'Mike Holt',
+                email: 'mike@vet.com',
+                password: hashedPassword,
+                role: 'admin'
+            }
+        ]);
 
         // Create sample pets
         const pets = await Pets.bulkCreate([
