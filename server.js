@@ -92,6 +92,34 @@ testConnection();
 
 module.exports = app;
 
+// Root endpoint
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Welcome to the Vet API',
+        version: '1.0.0',
+        endpoints: {
+            register: 'POST /api/register',
+            login: 'POST /api/login',
+            logout: 'POST /api/logout',
+            viewPets: 'GET /api/pets (requires auth)',
+            viewPet: 'GET /api/pets/:id (requires auth)',
+            createPet: 'POST /api/pets (requires auth)',
+            updatePet: 'PUT /api/pets/:id (requires auth)',
+            deletePet: 'DELETE /api/pets/:id (requires auth)',
+            viewVisits: 'GET /api/visits (requires auth)',
+            viewVisit: 'GET /api/visits/:id (requires auth)',
+            createVisit: 'POST /api/visits (requires auth)',
+            updateVisit: 'PUT /api/visits/:id (requires auth)',
+            deleteVisit: 'DELETE /api/visits/:id (requires auth)',
+            viewTreatments: 'GET /api/treatments (requires auth)',
+            viewTreatment: 'GET /api/treatments/:id (requires auth)',
+            createTreatment: 'POST /api/treatments (requires auth)',
+            updateTreatment: 'PUT /api/treatments/:id (requires auth)',
+            deleteTreatment: 'DELETE /api/treatments/:id (requires auth)',
+        }
+    });
+});
+
 // AUTHENTICATION ROUTES
 
 // POST /api/register - Register new user
